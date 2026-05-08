@@ -26,7 +26,7 @@ public:
     void addPlayer(std::string username, Rank r, SubRank sr){
         Player p(++playerIdCounter, username, r, sr);
         rankQueues[static_cast<int>(r)].push(p);
-        std::cout<<"Player added successfully!\n";
+        std::cout<<"Player added: ";
         p.display();
     }
 
@@ -37,7 +37,7 @@ public:
         };
 
         for(int i = 0; i < totalRanks; i++){
-            std::cout<< rankNames[i] << ":";
+            std::cout<< rankNames[i] << ": ";
 
             if(rankQueues[i].empty()){
                 std::cout << "empty\n";
