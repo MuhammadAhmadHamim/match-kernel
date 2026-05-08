@@ -1,5 +1,5 @@
-#ifndef Match_H
-#define Match_H
+#ifndef MATCH_H
+#define MATCH_H
 
 #include<iostream>
 #include"Player.h"
@@ -24,7 +24,8 @@ struct Match{
                   << player2.subRanktoString() << ")";
         if(isCrossRank)
             std::cout << "  [CROSS-RANK]\n";
-        }
+        std::cout << "\n";
+    }
 };
 
 #endif
