@@ -1,9 +1,11 @@
-#include<iostream>
+#include <iostream>
 #include"httplib.h"
+#include "Player.h"
+#include "Match.h"
+
 using namespace std;
 
 int main(){
-	
 	httplib::Server svr;
 	
 	svr.Get("/ping", [](const httplib::Request&, httplib::Response& res){
