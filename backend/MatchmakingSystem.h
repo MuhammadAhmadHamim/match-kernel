@@ -56,6 +56,60 @@ public:
         std::cout << "================================\n\n";
     }
 
+    void runMatchmaking(){
+        std::cout << "\n===== RUNNING MATCHMAKING =====\n";
+        int matchesThisRound = 0;
+
+        // Phase 1 - Same rank matching 
+        for(int i = 0; i < totalRanks; i++){
+            while(rankQueues[i].size() >= 2){
+
+                // Take two players from the front of the same Queue 
+                Player p1 = rankQueues[i].front(); rankQueues[i].pop();
+                Player p2 = rankQueues[i].front(); rankQueues[i].pop();
+
+                // Create a match
+                Match m(++matchIdCounter, p1, p2);
+                formedMatches.push_back(m);
+                matchesThisRound++;
+                
+                std::cout << "MATCHED: ";
+                m.display();
+            }
+        }
+
+        // Phase 2 - Increment waiting cycle for unmatched players
+        std::cout << "\n--- Unmatched players waiting ---\n";
+        bool anyWaiting = false;
+
+        for(int i = 0; i < totalRanks; i++){
+            if(!rankQueues[i].empty()){
+                anyWaiting = true;
+
+                // Again, copy trick to update waitCycles
+                std::queue<Player> temp;
+                while(!rankQueues[i].empty()){
+                    Player p = rankQueues[i].front();
+                    rankQueues[i].pop();
+                    p.waitCycles++;
+                    std::cout << p.userName << " waits... (cycles: "
+                              << p.waitCycles << ", expansion: "
+                              << p.expansionRadius() << ")\n";
+                    temp.push(p);
+                }
+                rankQueues[i] = temp;
+            }
+        }
+
+        if(!anyWaiting){
+            std::cout<<"All players matched!\n";
+        }
+
+        std::cout << "\nMatches this round: " << matchesThisRound << "\n";
+        std::cout << "Total matches so far: " << getTotalMatches() << "\n";
+        std::cout << "================================\n\n";
+    }
+
     void displayMatches() const {
         if(formedMatches.empty()) {
             std::cout << "No matches formed yet.\n";
