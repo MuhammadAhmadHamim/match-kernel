@@ -8,39 +8,22 @@ int main(){
 
     MatchmakingSystem system;
 
-    // Round 1 — Add players
-    cout << "=== ADDING PLAYERS ===\n";
-    system.addPlayer("Ace",    Rank::Gold,     SubRank::II);
-    system.addPlayer("Zoro",   Rank::Gold,     SubRank::II);
-    system.addPlayer("Levi",   Rank::Gold,     SubRank::III);
-    system.addPlayer("Mikasa", Rank::Silver,   SubRank::I);
-    system.addPlayer("Eren",   Rank::Platinum, SubRank::II);
-    system.addPlayer("Luffy",  Rank::Bronze,   SubRank::III);
+    // Add one lonely player with nobody to match with
+    // This forces them to wait multiple rounds
+    system.addPlayer("Luffy", Rank::Bronze, SubRank::III);
+    system.addPlayer("Levi",  Rank::Gold,   SubRank::I);
 
-    // Show queue before matching
-    system.displayQueues();
+    // Manual verification of expansionRadius math
+    cout << "\n--- MANUAL EXPANSION MATH CHECK ---\n";
+    Player testPlayer(999, "TestPlayer", Rank::Gold, SubRank::II);
 
-    // Run matchmaking — round 1
-    system.runMatchmaking();
-
-    // Show queue after round 1
-    system.displayQueues();
-
-    // Show matches formed
-    system.displayMatches();
-
-    // Round 2 — Add more players to match the lonely ones
-    cout << "=== ADDING MORE PLAYERS ===\n";
-    system.addPlayer("Gojo",   Rank::Silver,   SubRank::II);
-    system.addPlayer("Naruto", Rank::Platinum, SubRank::I);
-
-    system.displayQueues();
-
-    // Run matchmaking — round 2
-    system.runMatchmaking();
-
-    system.displayQueues();
-    system.displayMatches();
+    int cycleCheckpoints[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 15};
+    for(int cycles : cycleCheckpoints){
+        testPlayer.waitCycles = cycles;
+        cout << "waitCycles: " << cycles
+             << " → expansionRadius: "
+             << testPlayer.expansionRadius() << "\n";
+    }
 
     return 0;
 }
