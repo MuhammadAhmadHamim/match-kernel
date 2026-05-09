@@ -21,7 +21,7 @@ int main(){
     for(int cycles : cycleCheckpoints){
         testPlayer.waitCycles = cycles;
         cout << "waitCycles: " << cycles
-             << " → expansionRadius: "
+             << " -> expansionRadius: "
              << testPlayer.expansionRadius() << "\n";
     }
 
