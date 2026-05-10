@@ -6,36 +6,33 @@ using namespace std;
 
 int main(){
 
+    // Test 1 — Sub-rank priority
+    // Gold II should match with Gold II
+    // Gold I should match with Gold III (closest available)
     MatchmakingSystem system;
 
-    // Luffy and Levi — 3 ranks apart
-    // Luffy is Bronze(0), Levi is Gold(2)
-    // After 6 cycles radius = 2, they should match
-    system.addPlayer("Luffy", Rank::Bronze, SubRank::III);
-    system.addPlayer("Levi",  Rank::Gold,   SubRank::I);
+    cout << "=== TEST 1: Sub-rank priority ===\n";
+    system.addPlayer("Ace",   Rank::Gold, SubRank::II);
+    system.addPlayer("Zoro",  Rank::Gold, SubRank::I);
+    system.addPlayer("Luffy", Rank::Gold, SubRank::II);
+    system.addPlayer("Nami",  Rank::Gold, SubRank::III);
 
-    cout << "--- Running until expansion kicks in ---\n";
+    system.displayQueues();
+    system.runMatchmaking();
+    system.displayMatches();
 
-    for(int round = 1; round <= 7; round++){
-        cout << "========== ROUND " << round << " ==========\n";
-        system.runMatchmaking();
-    }
-
-    // Second scenario — mix of ranks, some need expansion
+    // Test 2 — Mixed scenario with expansion still working
+    cout << "\n=== TEST 2: Sub-rank + expansion together ===\n";
     MatchmakingSystem system2;
 
-    system2.addPlayer("Ace",    Rank::Gold,     SubRank::II);
-    system2.addPlayer("Mikasa", Rank::Platinum, SubRank::I);
-    system2.addPlayer("Eren",   Rank::Silver,   SubRank::III);
+    system2.addPlayer("Levi",   Rank::Gold,   SubRank::II);
+    system2.addPlayer("Mikasa", Rank::Silver, SubRank::I);
 
-    cout << "\n--- Mixed rank scenario ---\n";
-    for(int round = 1; round <= 5; round++){
+    for(int round = 1; round <= 4; round++){
         cout << "=== ROUND " << round << " ===\n";
         system2.runMatchmaking();
     }
     system2.displayMatches();
-
-    system.displayMatches();
 
     return 0;
 }

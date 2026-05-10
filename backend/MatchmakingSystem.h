@@ -4,6 +4,7 @@
 #include<iostream>
 #include<vector>
 #include<queue>
+#include<climits>
 
 #include"Player.h"
 #include"Match.h"
@@ -60,21 +61,56 @@ public:
         std::cout << "\n===== RUNNING MATCHMAKING =====\n";
         int matchesThisRound = 0;
 
-        // Phase 1 - Same rank matching 
-        for(int i = 0; i < totalRanks; i++){
-            while(rankQueues[i].size() >= 2){
+        // Phase 1 — Same rank matching with sub-rank priority
+        for(int i = 0; i < totalRanks; i++) {
+            if(rankQueues[i].size() < 2) continue;
 
-                // Take two players from the front of the same Queue 
-                Player p1 = rankQueues[i].front(); rankQueues[i].pop();
-                Player p2 = rankQueues[i].front(); rankQueues[i].pop();
+            // Convert queue to vector for flexible access
+            std::vector<Player> bucket;
+            while(!rankQueues[i].empty()) {
+                bucket.push_back(rankQueues[i].front());
+                rankQueues[i].pop();
+            }
 
-                // Create a match
-                Match m(++matchIdCounter, p1, p2);
-                formedMatches.push_back(m);
-                matchesThisRound++;
-                
-                std::cout << "MATCHED: ";
-                m.display();
+            std::vector<bool> matched(bucket.size(), false);
+
+            for(int j = 0; j < (int)bucket.size(); j++) {
+                if(matched[j]) continue;
+
+                int bestIndex = -1;
+                int bestDistance = INT_MAX;
+
+                // Search all unmatched players after j
+                for(int k = j + 1; k < (int)bucket.size(); k++) {
+                    if(matched[k]) continue;
+
+                    int distance = abs(static_cast<int>(bucket[j].subRank) -
+                                        static_cast<int>(bucket[k].subRank));
+                    if(distance < bestDistance) {
+                        bestDistance = distance;
+                        bestIndex = k;
+                    }
+                }
+
+                // If a valid match was found
+                if(bestIndex != -1) {
+                    matched[j] = true;
+                    matched[bestIndex] = true;
+
+                    Match m(++matchIdCounter, bucket[j], bucket[bestIndex]);
+                    formedMatches.push_back(m);
+                    matchesThisRound++;
+
+                    std::cout << "MATCHED (same-rank, sub-priority): ";
+                    m.display();
+                }
+            }
+
+            // Push unmatched players back into queue
+            for(int j = 0; j < (int)bucket.size(); j++) {
+                if(!matched[j]) {
+                    rankQueues[i].push(bucket[j]);
+                }
             }
         }
 
@@ -184,6 +220,21 @@ public:
 
     int getTotalMatches() const {
         return formedMatches.size();
+    }
+
+    int findBestMatch(const Player& p1, const std::vector<Player>& players){
+        int bestIndex = -1;
+        int bestDistance = INT_MAX;
+
+        for(int i = 0; i < players.size(); i++){
+            int distance = abs(static_cast<int>(p1.subRank) -
+                                static_cast<int>(players[i].subRank));
+            if(distance < bestDistance){
+                bestDistance = distance;
+                bestIndex = i;
+            }
+        }
+        return bestIndex;
     }
 };
 
