@@ -79,25 +79,74 @@ public:
         }
 
         // Phase 2 - Increment waiting cycle for unmatched players
-        std::cout << "\n--- Unmatched players waiting ---\n";
-        bool anyWaiting = false;
-
         for(int i = 0; i < totalRanks; i++){
             if(!rankQueues[i].empty()){
-                anyWaiting = true;
-
                 // Again, copy trick to update waitCycles
                 std::queue<Player> temp;
                 while(!rankQueues[i].empty()){
                     Player p = rankQueues[i].front();
                     rankQueues[i].pop();
                     p.waitCycles++;
-                    std::cout << p.userName << " waits... (cycles: "
-                              << p.waitCycles << ", expansion: "
-                              << p.expansionRadius() << ")\n";
                     temp.push(p);
                 }
                 rankQueues[i] = temp;
+            }
+        }
+
+        // Phase 3 — Expansion matching
+        // For each rank bucket, check if front player can expand
+        for(int i = 0; i < totalRanks; i++){
+            if(rankQueues[i].empty()) continue;
+
+            Player p1 = rankQueues[i].front();
+            int radius = p1.expansionRadius();
+            if(radius == 0) continue;
+
+            // Search adjacent buckets within radius
+            bool matched = false;
+            for(int offset = 1; offset <= radius && !matched; offset++){
+                // Check bucket above
+                int above = i + offset;
+                if(above < totalRanks && !rankQueues[above].empty()){
+                    rankQueues[i].pop();
+                    Player p2 = rankQueues[above].front();
+                    rankQueues[above].pop();
+                    Match m(++matchIdCounter, p1, p2);
+                    formedMatches.push_back(m);
+                    matchesThisRound++;
+                    matched = true;
+                    std::cout << "Matched (EXPANDED):";
+                    m.display();
+                }
+
+                // Check bucket below
+                int below = i - offset;
+                if(!matched && below >= 0 && !rankQueues[below].empty()){
+                    rankQueues[i].pop();
+                    Player p2 = rankQueues[below].front();
+                    rankQueues[below].pop();
+                    Match m(++matchIdCounter, p1, p2);
+                    formedMatches.push_back(m);
+                    matchesThisRound++;
+                    matched = true;
+                    std::cout << "Matched (EXPANDED):";
+                    m.display();
+                }
+            }
+        }
+
+        std::cout << "\n--- Unmatched players waiting ---\n";
+        bool anyWaiting = false;
+        for(int i = 0; i < totalRanks; i++){
+            if(!rankQueues[i].empty()){
+                anyWaiting = true;
+                std::queue<Player> temp = rankQueues[i];
+                while(!temp.empty()){
+                    Player p = temp.front(); temp.pop();
+                    std::cout << p.userName << " waits... (cycles: "
+                              << p.waitCycles << ", expansion: "
+                              << p.expansionRadius() << ")\n";
+                }
             }
         }
 

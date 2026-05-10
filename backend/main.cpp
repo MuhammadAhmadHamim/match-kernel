@@ -8,22 +8,34 @@ int main(){
 
     MatchmakingSystem system;
 
-    // Add one lonely player with nobody to match with
-    // This forces them to wait multiple rounds
+    // Luffy and Levi — 3 ranks apart
+    // Luffy is Bronze(0), Levi is Gold(2)
+    // After 6 cycles radius = 2, they should match
     system.addPlayer("Luffy", Rank::Bronze, SubRank::III);
     system.addPlayer("Levi",  Rank::Gold,   SubRank::I);
 
-    // Manual verification of expansionRadius math
-    cout << "\n--- MANUAL EXPANSION MATH CHECK ---\n";
-    Player testPlayer(999, "TestPlayer", Rank::Gold, SubRank::II);
+    cout << "--- Running until expansion kicks in ---\n";
 
-    int cycleCheckpoints[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 15};
-    for(int cycles : cycleCheckpoints){
-        testPlayer.waitCycles = cycles;
-        cout << "waitCycles: " << cycles
-             << " -> expansionRadius: "
-             << testPlayer.expansionRadius() << "\n";
+    for(int round = 1; round <= 7; round++){
+        cout << "========== ROUND " << round << " ==========\n";
+        system.runMatchmaking();
     }
+
+    // Second scenario — mix of ranks, some need expansion
+    MatchmakingSystem system2;
+
+    system2.addPlayer("Ace",    Rank::Gold,     SubRank::II);
+    system2.addPlayer("Mikasa", Rank::Platinum, SubRank::I);
+    system2.addPlayer("Eren",   Rank::Silver,   SubRank::III);
+
+    cout << "\n--- Mixed rank scenario ---\n";
+    for(int round = 1; round <= 5; round++){
+        cout << "=== ROUND " << round << " ===\n";
+        system2.runMatchmaking();
+    }
+    system2.displayMatches();
+
+    system.displayMatches();
 
     return 0;
 }
