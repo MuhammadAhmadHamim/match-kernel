@@ -6,33 +6,33 @@ using namespace std;
 
 int main(){
 
-    // Test 1 — Sub-rank priority
-    // Gold II should match with Gold II
-    // Gold I should match with Gold III (closest available)
     MatchmakingSystem system;
 
-    cout << "=== TEST 1: Sub-rank priority ===\n";
-    system.addPlayer("Ace",   Rank::Gold, SubRank::II);
-    system.addPlayer("Zoro",  Rank::Gold, SubRank::I);
-    system.addPlayer("Luffy", Rank::Gold, SubRank::II);
-    system.addPlayer("Nami",  Rank::Gold, SubRank::III);
+    system.addPlayer("Ace",   Rank::Gold,     SubRank::II);
+    system.addPlayer("Zoro",  Rank::Gold,     SubRank::II);
+    system.addPlayer("Levi",  Rank::Platinum, SubRank::I);
+    system.addPlayer("Luffy", Rank::Bronze,   SubRank::III);
 
-    system.displayQueues();
+    cout << "\n--- Queue State JSON ---\n";
+    cout << system.getQueueStateJson() << "\n";
+
     system.runMatchmaking();
-    system.displayMatches();
 
-    // Test 2 — Mixed scenario with expansion still working
-    cout << "\n=== TEST 2: Sub-rank + expansion together ===\n";
-    MatchmakingSystem system2;
+    cout << "\n--- Matches JSON ---\n";
+    cout << system.getMatchesJson() << "\n";
 
-    system2.addPlayer("Levi",   Rank::Gold,   SubRank::II);
-    system2.addPlayer("Mikasa", Rank::Silver, SubRank::I);
+    cout << "\n--- Stats JSON ---\n";
+    cout << system.getStatsJson() << "\n";
 
-    for(int round = 1; round <= 4; round++){
-        cout << "=== ROUND " << round << " ===\n";
-        system2.runMatchmaking();
-    }
-    system2.displayMatches();
+    cout << "\n--- Single Player JSON ---\n";
+    Player p(42, "TestPlayer", Rank::Diamond, SubRank::I);
+    cout << JsonHelper::playerToJson(p) << "\n";
+
+    cout << "\n--- Error Response ---\n";
+    cout << JsonHelper::errorResponse("Player name cannot be empty") << "\n";
+
+    cout << "\n--- Success Response ---\n";
+    cout << JsonHelper::successResponse("message", "\"Player added\"") << "\n";
 
     return 0;
 }

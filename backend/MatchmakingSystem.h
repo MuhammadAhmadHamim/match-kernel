@@ -8,6 +8,7 @@
 
 #include"Player.h"
 #include"Match.h"
+#include"JsonHelper.h"
 
 class MatchmakingSystem{
 private:
@@ -222,19 +223,32 @@ public:
         return formedMatches.size();
     }
 
-    int findBestMatch(const Player& p1, const std::vector<Player>& players){
-        int bestIndex = -1;
-        int bestDistance = INT_MAX;
+    std:: string getQueueStateJson() const {
+        std::string rankNames[] = {
+            "Bronze", "Silver", "Gold", "Platinum", "Diamond"
+        };
 
-        for(int i = 0; i < players.size(); i++){
-            int distance = abs(static_cast<int>(p1.subRank) -
-                                static_cast<int>(players[i].subRank));
-            if(distance < bestDistance){
-                bestDistance = distance;
-                bestIndex = i;
-            }
+        std::string result = "{";
+        for(int i = 0; i < totalRanks; i++){
+            result += "\"" + rankNames[i] + "\":";
+            result += JsonHelper::queueToJson(rankQueues[i]);
+            if(i < totalRanks - 1) result += ",";
         }
-        return bestIndex;
+        result += "}";
+        return result;
+    }
+
+    // Returns all formed matches as JSON
+    std::string getMatchesJson() const {
+        return JsonHelper::matchesToJson(formedMatches);
+    }
+
+    // Return system stats as JSON
+    std::string getStatsJson() const {
+        return "{"
+                "\"totalPlayers\":" + std::to_string(getTotalPlayers()) + ","
+                "\"totalMatches\":" + std::to_string(getTotalMatches()) + 
+        "}";
     }
 };
 
