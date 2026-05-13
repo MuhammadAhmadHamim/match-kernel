@@ -1,61 +1,57 @@
 #include <iostream>
-#include "Player.h"
-#include "Match.h"
-#include "MatchmakingSystem.h"
-using namespace std;
-
-int main(){
-
-    MatchmakingSystem system;
-
-    system.addPlayer("Ace",   Rank::Gold,     SubRank::II);
-    system.addPlayer("Zoro",  Rank::Gold,     SubRank::II);
-    system.addPlayer("Levi",  Rank::Platinum, SubRank::I);
-    system.addPlayer("Luffy", Rank::Bronze,   SubRank::III);
-
-    cout << "\n--- Queue State JSON ---\n";
-    cout << system.getQueueStateJson() << "\n";
-
-    system.runMatchmaking();
-
-    cout << "\n--- Matches JSON ---\n";
-    cout << system.getMatchesJson() << "\n";
-
-    cout << "\n--- Stats JSON ---\n";
-    cout << system.getStatsJson() << "\n";
-
-    cout << "\n--- Single Player JSON ---\n";
-    Player p(42, "TestPlayer", Rank::Diamond, SubRank::I);
-    cout << JsonHelper::playerToJson(p) << "\n";
-
-    cout << "\n--- Error Response ---\n";
-    cout << JsonHelper::errorResponse("Player name cannot be empty") << "\n";
-
-    cout << "\n--- Success Response ---\n";
-    cout << JsonHelper::successResponse("message", "\"Player added\"") << "\n";
-
-    return 0;
-}
-/*
-#include <iostream>
 #include"httplib.h"
 #include "Player.h"
 #include "Match.h"
-
+#include "MatchmakingSystem.h"
+#include "JsonHelper.h"
 using namespace std;
 
+// Global system instance — persists across all requests
+MatchmakingSystem matchSystem;
+
+// Helper to add CORS headers to every response
+void setCORSHeaders(httplib::Response& res){
+    res.set_header("Access-Control-Allow-Origin", "*");
+    res.set_header("Access-Control-Allow-Methods",
+                    "GET, POST, OPTIONS");
+    res.set_header("Access-Control-Allow-Headers",
+                    "Content-Type");
+}
+
+// Parse rank string to enum
+Rank parseRank(const string& r) {
+    if(r == "Bronze")   return Rank::Bronze;
+    if(r == "Silver")   return Rank::Silver;
+    if(r == "Gold")     return Rank::Gold;
+    if(r == "Platinum") return Rank::Platinum;
+    if(r == "Diamond")  return Rank::Diamond;
+    return Rank::Bronze; // default fallback
+}
+
+// Parse subrank string to enum
+SubRank parseSubRank(const string& sr) {
+    if(sr == "I")   return SubRank::I;
+    if(sr == "II")  return SubRank::II;
+    if(sr == "III") return SubRank::III;
+    return SubRank::I; // default fallback
+}
+
 int main(){
-	httplib::Server svr;
 	
-	svr.Get("/ping", [](const httplib::Request&, httplib::Response& res){
+    httplib::Server svr;
+	
+    // Get queue-state
+	svr.Get("/queue-state", [](const httplib::Request&,
+                                    httplib::Response& res){
+		setCORSHeaders(res);
+        string json = matchSystem.getQueueStateJson();
+        res.set_content(
+            JsonHelper::successResponse("queues", json),
+            "application/json"
+        );
 		
-		res.set_content("pong", "text/plain");
 	});
-	
-	cout<<"MatchKernel server running on http://localhost:8080\n";
-	
+    
 	svr.listen("localhost",8080);
-	
 	return 0;
 }
-*/
