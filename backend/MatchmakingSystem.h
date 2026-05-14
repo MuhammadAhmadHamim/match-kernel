@@ -5,10 +5,13 @@
 #include<vector>
 #include<queue>
 #include<climits>
+#include <fstream>
+#include <sstream>
 
 #include"Player.h"
 #include"Match.h"
 #include"JsonHelper.h"
+#include"Utils.h"
 
 class MatchmakingSystem{
 private:
@@ -249,6 +252,37 @@ public:
                 "\"totalPlayers\":" + std::to_string(getTotalPlayers()) + ","
                 "\"totalMatches\":" + std::to_string(getTotalMatches()) + 
         "}";
+    }
+
+    // Return number of players loaded from file 
+    int loadPlayersFromCSV(const std::string& csvContent) {
+        int count = 0;
+        std::istringstream stream(csvContent);
+        std::string line;
+    
+        getline(stream, line); // skip header
+    
+        while(getline(stream, line)) {
+            if(line.empty()) continue;
+            if(!line.empty() && line.back() == '\r')
+                line.pop_back();
+    
+            std::stringstream ss(line);
+            std::string username, rankStr, srStr;
+    
+            getline(ss, username,    ',');
+            getline(ss, rankStr, ',');
+            getline(ss, srStr,   ',');
+    
+            if(username.empty() || rankStr.empty() || srStr.empty())
+                continue;
+    
+            Rank r     = Utils::parseRank(rankStr);
+            SubRank sr = Utils::parseSubRank(srStr);
+            addPlayer(username, r, sr);
+            count++;
+        }
+        return count;
     }
 };
 
