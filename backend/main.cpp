@@ -4,6 +4,8 @@
 #include "Match.h"
 #include "MatchmakingSystem.h"
 #include "JsonHelper.h"
+#include "Utils.h"
+
 using namespace std;
 
 // Global system instance — persists across all requests
@@ -16,24 +18,6 @@ void setCORSHeaders(httplib::Response& res){
                     "GET, POST, OPTIONS");
     res.set_header("Access-Control-Allow-Headers",
                     "Content-Type");
-}
-
-// Parse rank string to enum
-Rank parseRank(const string& r) {
-    if(r == "Bronze")   return Rank::Bronze;
-    if(r == "Silver")   return Rank::Silver;
-    if(r == "Gold")     return Rank::Gold;
-    if(r == "Platinum") return Rank::Platinum;
-    if(r == "Diamond")  return Rank::Diamond;
-    return Rank::Bronze; // default fallback
-}
-
-// Parse subrank string to enum
-SubRank parseSubRank(const string& sr) {
-    if(sr == "I")   return SubRank::I;
-    if(sr == "II")  return SubRank::II;
-    if(sr == "III") return SubRank::III;
-    return SubRank::I; // default fallback
 }
 
 int main(){
@@ -118,8 +102,8 @@ int main(){
             return;
         }
 
-        Rank r = parseRank(rankStr);
-        SubRank sr = parseSubRank(subrankStr);
+        Rank r = Utils::parseRank(rankStr);
+        SubRank sr = Utils::parseSubRank(subrankStr);
         matchSystem.addPlayer(username, r, sr);
 
         res.set_content(
@@ -142,6 +126,18 @@ int main(){
             "\"queues\":" + queues + ","
             "\"matches\":" + matches + "}";
         res.set_content(result, "application/json");
+    });
+
+    //Post load-file
+    svr.Post("/load-file", [](const httplib::Request& req,
+                                    httplib::Response& res){
+        setCORSHeaders(res);
+        int count = matchSystem.loadPlayersFromCSV(req.body);
+        res.set_content(
+            JsonHelper::successResponse("message",
+                "\"" + to_string(count) + " players loaded\""),
+            "application/json"
+        );
     });
 
 	svr.listen("localhost",8080);
