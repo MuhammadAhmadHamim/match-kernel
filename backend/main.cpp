@@ -39,11 +39,19 @@ SubRank parseSubRank(const string& sr) {
 int main(){
 	
     httplib::Server svr;
+
+    // Handle preflight CORS requests
+    svr.Options(R"(.*)", [](const httplib::Request&,
+                            httplib::Response& res){
+        setCORSHeaders(res);
+        res.status = 200;
+    });
 	
     // Get /queue-state
 	svr.Get("/queue-state", [](const httplib::Request&,
                                     httplib::Response& res){
-		setCORSHeaders(res);
+        std::cout << "GET /queue-state hit!\n";
+        setCORSHeaders(res);
         string json = matchSystem.getQueueStateJson();
         res.set_content(
             JsonHelper::successResponse("queues", json),
@@ -55,6 +63,7 @@ int main(){
     // Get /matches
 	svr.Get("/matches", [](const httplib::Request&,
                                     httplib::Response& res){
+        std::cout << "GET /matches hit!\n";
         setCORSHeaders(res);
         string json = matchSystem.getMatchesJson();
         res.set_content(
@@ -67,6 +76,7 @@ int main(){
     // Get /stats
 	svr.Get("/stats", [](const httplib::Request&,
                                     httplib::Response& res){
+        std::cout << "GET /stats hit!\n";
         setCORSHeaders(res);
         res.set_content(
             matchSystem.getStatsJson(),
@@ -78,11 +88,27 @@ int main(){
     // Post /add-player
     svr.Post("/add-player", [](const httplib::Request& req,
                                     httplib::Response& res){
+        std::cout << "POST /add-player hit!\n";
         setCORSHeaders(res);
+        
+        // Parse body manually: "username=Ace&rank=Gold&subrank=II"
+        string body = req.body;
+        string username, rankStr, subrankStr;
 
-        string username = req.get_param_value("username");
-        string rankStr = req.get_param_value("rank");
-        string subrankStr = req.get_param_value("subrank");
+        // Helper lambda to extract value by key
+        auto getValue = [&](const string& key) -> string {
+        string search = key + "=";
+        size_t start = body.find(search);
+        if(start == string::npos) return "";
+        start += search.length();
+        size_t end = body.find('&', start);
+        if(end == string::npos) end = body.length();
+        return body.substr(start, end - start);
+        };
+
+        username   = getValue("username");
+        rankStr    = getValue("rank");
+        subrankStr = getValue("subrank");
 
         if(username.empty() || rankStr.empty() || subrankStr.empty()){
             res.set_content(
@@ -100,6 +126,22 @@ int main(){
             JsonHelper::successResponse("success", "\"Player " + username + " added to queue\""),
             "application/json"
         );
+    });
+
+    // Post /run-matchmaking
+    svr.Post("/run-matchmaking", [](const httplib::Request& req,
+                                    httplib::Response& res){
+        std::cout << "POST /run-matchmaking hit!\n";
+        setCORSHeaders(res);
+
+        matchSystem.runMatchmaking();
+        string queues = matchSystem.getQueueStateJson();
+        string matches = matchSystem.getMatchesJson();
+        string result = 
+            "{\"status\":\"success\","
+            "\"queues\":" + queues + ","
+            "\"matches\":" + matches + "}";
+        res.set_content(result, "application/json");
     });
 
 	svr.listen("localhost",8080);
