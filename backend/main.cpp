@@ -40,7 +40,7 @@ int main(){
 	
     httplib::Server svr;
 	
-    // Get queue-state
+    // Get /queue-state
 	svr.Get("/queue-state", [](const httplib::Request&,
                                     httplib::Response& res){
 		setCORSHeaders(res);
@@ -51,7 +51,30 @@ int main(){
         );
 		
 	});
-    
+
+    // Get /matches
+	svr.Get("/matches", [](const httplib::Request&,
+                                    httplib::Response& res){
+        setCORSHeaders(res);
+        string json = matchSystem.getMatchesJson();
+        res.set_content(
+            JsonHelper::successResponse("matches", json),
+            "application/json"
+        );
+
+    });
+
+    // Get /stats
+	svr.Get("/stats", [](const httplib::Request&,
+                                    httplib::Response& res){
+        setCORSHeaders(res);
+        res.set_content(
+            matchSystem.getStatsJson(),
+            "application/json"
+        );
+
+    });
+
 	svr.listen("localhost",8080);
 	return 0;
 }
