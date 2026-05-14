@@ -75,6 +75,33 @@ int main(){
 
     });
 
+    // Post /add-player
+    svr.Post("/add-player", [](const httplib::Request& req,
+                                    httplib::Response& res){
+        setCORSHeaders(res);
+
+        string username = req.get_param_value("username");
+        string rankStr = req.get_param_value("rank");
+        string subrankStr = req.get_param_value("subrank");
+
+        if(username.empty() || rankStr.empty() || subrankStr.empty()){
+            res.set_content(
+                JsonHelper::errorResponse("Missing fields"),
+                "application/json"
+            );
+            return;
+        }
+
+        Rank r = parseRank(rankStr);
+        SubRank sr = parseSubRank(subrankStr);
+        matchSystem.addPlayer(username, r, sr);
+
+        res.set_content(
+            JsonHelper::successResponse("success", "\"Player " + username + " added to queue\""),
+            "application/json"
+        );
+    });
+
 	svr.listen("localhost",8080);
 	return 0;
 }
