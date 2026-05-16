@@ -10,26 +10,21 @@ async function fetchJSON(url, options = {}) {
     return null;
   }
 }
-
-// ---- API calls ----
 async function getQueueState() {
   const data = await fetchJSON(`${API_BASE}/queue-state`);
   if (data && data.status === 'success') return data.queues;
   return null;
 }
-
 async function getMatches() {
   const data = await fetchJSON(`${API_BASE}/matches`);
   if (data && data.status === 'success') return data.matches;
   return [];
 }
-
 async function getStats() {
   const data = await fetchJSON(`${API_BASE}/stats`);
   if (data) return data;
   return { totalPlayers: 0, totalMatches: 0 };
 }
-
 async function addPlayer(username, rank, subrank) {
   const params = new URLSearchParams({ username, rank, subrank });
   const result = await fetchJSON(`${API_BASE}/add-player`, {
@@ -39,20 +34,16 @@ async function addPlayer(username, rank, subrank) {
   });
   return result;
 }
-
 async function runMatchmaking() {
   const result = await fetchJSON(`${API_BASE}/matchmake`, { method: 'POST' });
   return result;
 }
-
-// ---- UI Rendering ----
 function renderQueues(queuesData) {
   const container = document.getElementById('queuesContainer');
   if (!queuesData) {
-    container.innerHTML = '<div class="empty-queue">❌ Failed to load queues</div>';
+    container.innerHTML = '<div class="empty-queue">❌ -Failed to load queues</div>';
     return;
   }
-  
   const rankOrder = ['Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond'];
   let html = '';
   for (const rank of rankOrder) {
@@ -115,8 +106,6 @@ async function refreshAll() {
   renderMatches(matches);
   updateStats();
 }
-
-// ---- Event handlers ----
 async function handleAddPlayer() {
   const username = document.getElementById('username').value.trim();
   const rank = document.getElementById('rankSelect').value;
@@ -126,7 +115,6 @@ async function handleAddPlayer() {
     alert('Please enter a username');
     return;
   }
-  
   const result = await addPlayer(username, rank, subrank);
   if (result && result.status === 'success') {
     document.getElementById('username').value = '';
@@ -135,18 +123,15 @@ async function handleAddPlayer() {
     alert('Failed to add player: ' + (result?.message || 'unknown error'));
   }
 }
-
 async function handleMatchmake() {
   const result = await runMatchmaking();
   if (result && result.status === 'success') {
     refreshAll();
   } else {
-    alert('Matchmaking triggered but server response invalid. Check if /matchmake endpoint exists.');
-    refreshAll(); // still refresh to show possible changes
+    alert('Matchmaking triggered but server response invalid.');
+    refreshAll();
   }
 }
-
-// Helper to escape HTML
 function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/[&<>]/g, function(m) {
@@ -156,11 +141,8 @@ function escapeHtml(str) {
     return m;
   });
 }
-
-// ---- Initialization ----
 document.addEventListener('DOMContentLoaded', () => {
   refreshAll();
-  
   document.getElementById('refreshBtn').addEventListener('click', refreshAll);
   document.getElementById('addPlayerBtn').addEventListener('click', handleAddPlayer);
   document.getElementById('matchmakeBtn').addEventListener('click', handleMatchmake);

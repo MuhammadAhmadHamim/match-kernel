@@ -29,18 +29,22 @@
           <h2>➕ Add new warrior</h2>
           <div class="form-row">
             <input type="text" id="username" placeholder="Username" autocomplete="off">
-            <select id="rankSelect">
-              <option value="Bronze">Bronze</option>
-              <option value="Silver">Silver</option>
-              <option value="Gold" selected>Gold</option>
-              <option value="Platinum">Platinum</option>
-              <option value="Diamond">Diamond</option>
-            </select>
-            <select id="subrankSelect">
-              <option value="I">I</option>
-              <option value="II">II</option>
-              <option value="III">III</option>
-            </select>
+            <div class="select-container">
+                <select id="rankSelect">
+                <option value="Bronze">Bronze</option>
+                <option value="Silver">Silver</option>
+                <option value="Gold" selected>Gold</option>
+                <option value="Platinum">Platinum</option>
+                <option value="Diamond">Diamond</option>
+                </select>
+            </div>
+            <div class="select-container">
+                <select id="subrankSelect">
+                <option value="I">I</option>
+                <option value="II">II</option>
+                <option value="III">III</option>
+                </select>
+            </div>
             <button id="addPlayerBtn">➕ Enqueue</button>
           </div>
         </div>
