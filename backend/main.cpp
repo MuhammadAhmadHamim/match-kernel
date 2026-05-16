@@ -1,7 +1,8 @@
 #include <iostream>
-#include"httplib.h"
+#include <cstring>
+#include "httplib.h"
 #include "Player.h"
-#include "Match.h"
+#include "Match.h" 
 #include "MatchmakingSystem.h"
 #include "JsonHelper.h"
 using namespace std;
@@ -100,6 +101,12 @@ int main(){
             JsonHelper::successResponse("success", "\"Player " + username + " added to queue\""),
             "application/json"
         );
+    });
+
+    svr.Post("/matchmake", [](const httplib::Request&, httplib::Response& res){
+        setCORSHeaders(res);
+        matchSystem.runMatchmaking();
+        res.set_content("{\"status\":\"success\", \"message\":\"Matchmaking executed\"}", "application/json");
     });
 
 	svr.listen("localhost",8080);
