@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Matchmaking Arena | Lobby Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>⚔️ MATCHMAKING HUB</h1>
+      <p>Rank-based queue · Dynamic expansion · Real-time lobby</p>
+    </header>
+
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><span id="totalPlayers">0</span><label>Players in queue</label></div>
+      <div class="stat-card"><span id="totalMatches">0</span><label>Matches formed</label></div>
+    </div>
+
+    <div class="action-bar">
+      <button id="refreshBtn" class="primary">⟳ Refresh all</button>
+      <button id="matchmakeBtn" class="warning">🎮 Run Matchmaking</button>
+    </div>
+
+    <div class="dashboard">
+      <div class="queues-panel">
+        <div class="section">
+          <h2>➕ Add new warrior</h2>
+          <div class="form-row">
+            <input type="text" id="username" placeholder="Username" autocomplete="off">
+            <select id="rankSelect">
+              <option value="Bronze">Bronze</option>
+              <option value="Silver">Silver</option>
+              <option value="Gold" selected>Gold</option>
+              <option value="Platinum">Platinum</option>
+              <option value="Diamond">Diamond</option>
+            </select>
+            <select id="subrankSelect">
+              <option value="I">I</option>
+              <option value="II">II</option>
+              <option value="III">III</option>
+            </select>
+            <button id="addPlayerBtn">➕ Enqueue</button>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>📋 Rank queues</h2>
+          <div id="queuesContainer" class="rank-grid">
+            <div class="loading-placeholder">Loading queues...</div>
+          </div>
+        </div>
+      </div>
+      <div class="matches-panel">
+        <div class="section">
+          <h2>🏆 Recent matches</h2>
+          <div id="matchesList" class="matches-list">
+            <div class="empty-matches">No matches yet. Run matchmaking!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
