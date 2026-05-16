@@ -1,7 +1,8 @@
 #include <iostream>
-#include"httplib.h"
+#include <cstring>
+#include "httplib.h"
 #include "Player.h"
-#include "Match.h"
+#include "Match.h" 
 #include "MatchmakingSystem.h"
 #include "JsonHelper.h"
 #include "Utils.h"
@@ -112,32 +113,10 @@ int main(){
         );
     });
 
-    // Post /run-matchmaking
-    svr.Post("/run-matchmaking", [](const httplib::Request& req,
-                                    httplib::Response& res){
-        std::cout << "POST /run-matchmaking hit!\n";
+    svr.Post("/matchmake", [](const httplib::Request&, httplib::Response& res){
         setCORSHeaders(res);
-
         matchSystem.runMatchmaking();
-        string queues = matchSystem.getQueueStateJson();
-        string matches = matchSystem.getMatchesJson();
-        string result = 
-            "{\"status\":\"success\","
-            "\"queues\":" + queues + ","
-            "\"matches\":" + matches + "}";
-        res.set_content(result, "application/json");
-    });
-
-    //Post load-file
-    svr.Post("/load-file", [](const httplib::Request& req,
-                                    httplib::Response& res){
-        setCORSHeaders(res);
-        int count = matchSystem.loadPlayersFromCSV(req.body);
-        res.set_content(
-            JsonHelper::successResponse("message",
-                "\"" + to_string(count) + " players loaded\""),
-            "application/json"
-        );
+        res.set_content("{\"status\":\"success\", \"message\":\"Matchmaking executed\"}", "application/json");
     });
 
 	svr.listen("localhost",8080);
