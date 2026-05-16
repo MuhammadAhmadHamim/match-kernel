@@ -1,0 +1,5 @@
+.vscode/
+server.exe
+*.exe
+*.o
+*.obj
