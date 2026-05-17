@@ -247,7 +247,6 @@ Mikasa,Silver,I
 ```bash
 # Clone
 git clone https://github.com/MuhammadAhmadHamim/MatchKernel.git
-cd MatchKernel
 
 # Build and launch — one command does everything
 .\build.bat
