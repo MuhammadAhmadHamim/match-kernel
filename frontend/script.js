@@ -38,6 +38,14 @@ async function runMatchmaking() {
   const result = await fetchJSON(`${API_BASE}/matchmake`, { method: 'POST' });
   return result;
 }
+async function loadFile(csvText) {
+  const result = await fetchJSON(`${API_BASE}/load-file`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: csvText
+  });
+  return result;
+}
 function renderQueues(queuesData) {
   const container = document.getElementById('queuesContainer');
   if (!queuesData) {
@@ -132,6 +140,38 @@ async function handleMatchmake() {
     refreshAll();
   }
 }
+async function handleLoadFile() {
+  const fileInput = document.getElementById('csvFile');
+  const msgDiv = document.getElementById('loadFileMsg');
+
+  if (!fileInput.files || fileInput.files.length === 0) {
+    msgDiv.style.color = '#f87171';
+    msgDiv.innerText = 'Please select a CSV file first.';
+    return;
+  }
+
+  const file = fileInput.files[0];
+
+  // Read file as text
+  const csvText = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error('Failed to read file'));
+    reader.readAsText(file);
+  });
+
+  const result = await loadFile(csvText);
+
+  if (result && result.status === 'success') {
+    msgDiv.style.color = '#4ade80';
+    msgDiv.innerText = '✔ ' + result.message;
+    fileInput.value = ''; // reset file input
+    refreshAll();
+  } else {
+    msgDiv.style.color = '#f87171';
+    msgDiv.innerText = '✘ Failed to load file.';
+  }
+}
 function escapeHtml(str) {
   if (!str) return '';
   return str.replace(/[&<>]/g, function(m) {
@@ -146,4 +186,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('refreshBtn').addEventListener('click', refreshAll);
   document.getElementById('addPlayerBtn').addEventListener('click', handleAddPlayer);
   document.getElementById('matchmakeBtn').addEventListener('click', handleMatchmake);
+  document.getElementById('loadFileBtn').addEventListener('click', handleLoadFile);
 });

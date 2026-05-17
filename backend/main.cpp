@@ -119,6 +119,18 @@ int main(){
         res.set_content("{\"status\":\"success\", \"message\":\"Matchmaking executed\"}", "application/json");
     });
 
+    svr.Post("/load-file", [](const httplib::Request& req,
+                                httplib::Response& res){
+        std::cout << "POST /load-file hit!\n";
+        setCORSHeaders(res);
+        int count = matchSystem.loadPlayersFromCSV(req.body);
+        res.set_content(
+            JsonHelper::successResponse("message",
+                "\"" + std::to_string(count) + " players loaded\""),
+            "application/json"
+        );
+    });
+
 	svr.listen("localhost",8080);
 	return 0;
 }

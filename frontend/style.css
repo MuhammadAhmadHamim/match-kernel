@@ -285,3 +285,29 @@ button:hover {
   color: #6b7280;
   padding: 1rem;
 }
+
+input[type="file"] {
+  background: #1e293b;
+  border: 1px solid #334155;
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  flex: 1 1 140px;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+  background: #334155;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.5rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  margin-right: 0.8rem;
+  font-size: 0.8rem;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: #475569;
+}
