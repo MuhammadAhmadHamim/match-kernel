@@ -94,21 +94,100 @@ MatchKernel/
 
 ```cpp
 // Phase 1 — Same-rank matching with sub-rank proximity priority
-for (auto& [rank, queue] : rankQueues) {
-    std::sort(queue.begin(), queue.end(), compareBySubrank);
-    while (queue.size() >= 2) {
-        Match m = formMatch(queue.front(), queue.back());
-        matches.push_back(m);
-        queue.pop_front(); queue.pop_back();
+for(int i = 0; i < totalRanks; i++) {
+    if(rankQueues[i].size() < 2) continue;
+
+    // Convert queue to vector for flexible access
+    std::vector<Player> bucket;
+    while(!rankQueues[i].empty()) {
+        bucket.push_back(rankQueues[i].front());
+        rankQueues[i].pop();
+    }
+
+    std::vector<bool> matched(bucket.size(), false);
+
+    for(int j = 0; j < (int)bucket.size(); j++) {
+        if(matched[j]) continue;
+
+        int bestIndex = -1;
+        int bestDistance = INT_MAX;
+
+        // Search all unmatched players after j
+        for(int k = j + 1; k < (int)bucket.size(); k++) {
+            if(matched[k]) continue;
+
+            int distance = abs(static_cast<int>(bucket[j].subRank) -
+                                        static_cast<int>(bucket[k].subRank));
+            if(distance < bestDistance) {
+                bestDistance = distance;
+                bestIndex = k;
+            }
+        }
+
+        // If a valid match was found
+        if(bestIndex != -1) {
+            matched[j] = true;
+            matched[bestIndex] = true;
+
+            Match m(++matchIdCounter, bucket[j], bucket[bestIndex]);
+            formedMatches.push_back(m);
+            matchesThisRound++;
+
+            std::cout << "MATCHED (same-rank, sub-priority): ";
+            m.display();
+        }
+    }
+
+    // Push unmatched players back into queue
+    for(int j = 0; j < (int)bucket.size(); j++) {
+        if(!matched[j]) {
+            rankQueues[i].push(bucket[j]);
+        }
     }
 }
 
 // Phase 3 — Expansion: wait cycles unlock cross-rank matching
-for (auto& player : unmatched) {
-    player.waitCycles++;
-    if (player.waitCycles % 3 == 0)
-        player.expansionRadius++;   // search one rank tier wider
+// For each rank bucket, check if front player can expand
+for(int i = 0; i < totalRanks; i++){
+    if(rankQueues[i].empty()) continue;
+
+    Player p1 = rankQueues[i].front();
+    int radius = p1.expansionRadius();
+    if(radius == 0) continue;
+
+    // Search adjacent buckets within radius
+    bool matched = false;
+    for(int offset = 1; offset <= radius && !matched; offset++){
+        // Check bucket above
+        int above = i + offset;
+        if(above < totalRanks && !rankQueues[above].empty()){
+            rankQueues[i].pop();
+            Player p2 = rankQueues[above].front();
+            rankQueues[above].pop();
+            Match m(++matchIdCounter, p1, p2);
+            formedMatches.push_back(m);
+            matchesThisRound++;
+            matched = true;
+            std::cout << "Matched (EXPANDED):";
+            m.display();
+        }
+
+        // Check bucket below
+        int below = i - offset;
+        if(!matched && below >= 0 && !rankQueues[below].empty()){
+            rankQueues[i].pop();
+            Player p2 = rankQueues[below].front();
+            rankQueues[below].pop();
+            Match m(++matchIdCounter, p1, p2);
+            formedMatches.push_back(m);
+            matchesThisRound++;
+            matched = true;
+            std::cout << "Matched (EXPANDED):";
+            m.display();
+        }
+    }
 }
+
 ```
 
 ---
