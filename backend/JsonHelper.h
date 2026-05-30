@@ -4,7 +4,7 @@
 #include<string>
 #include<vector>
 
-#include"queue"
+#include"queue.h"
 #include"Player.h"
 #include"Match.h"
 
@@ -48,7 +48,7 @@ public:
     }
 
     // Serialize a single rank bucket into JSON array
-    static std::string queueToJson(std::queue<Player> q){
+    static std::string queueToJson(CustomQueue<Player> q){
         // Takes queue by value (copy) so original is untouched
         std::string result = "[";
         bool first = true;

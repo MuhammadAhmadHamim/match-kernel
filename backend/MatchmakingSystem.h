@@ -11,12 +11,12 @@
 #include"Match.h"
 #include"JsonHelper.h"
 #include"Utils.h"
-#include"queue"
+#include"queue.h"
 
 class MatchmakingSystem{
 private:
     
-    std::vector<std::queue<Player>> rankQueues;
+    std::vector<CustomQueue<Player>> rankQueues;
     std::vector<Match> formedMatches;
     int totalRanks = 5;
     int playerIdCounter = 0;
@@ -49,7 +49,7 @@ public:
                 continue;
             }
 
-            std::queue<Player> temp = rankQueues[i];
+            CustomQueue<Player> temp = rankQueues[i];
             while(!temp.empty()){
                 Player p = temp.front();
                 temp.pop();
@@ -122,7 +122,7 @@ public:
         for(int i = 0; i < totalRanks; i++){
             if(!rankQueues[i].empty()){
                 // Again, copy trick to update waitCycles
-                std::queue<Player> temp;
+                CustomQueue<Player> temp;
                 while(!rankQueues[i].empty()){
                     Player p = rankQueues[i].front();
                     rankQueues[i].pop();
@@ -180,7 +180,7 @@ public:
         for(int i = 0; i < totalRanks; i++){
             if(!rankQueues[i].empty()){
                 anyWaiting = true;
-                std::queue<Player> temp = rankQueues[i];
+                CustomQueue<Player> temp = rankQueues[i];
                 while(!temp.empty()){
                     Player p = temp.front(); temp.pop();
                     std::cout << p.userName << " waits... (cycles: "
