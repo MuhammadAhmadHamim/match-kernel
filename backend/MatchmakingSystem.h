@@ -3,7 +3,6 @@
 
 #include<iostream>
 #include<vector>
-#include<queue>
 #include<climits>
 #include <fstream>
 #include <sstream>
@@ -12,6 +11,7 @@
 #include"Match.h"
 #include"JsonHelper.h"
 #include"Utils.h"
+#include"queue"
 
 class MatchmakingSystem{
 private:
