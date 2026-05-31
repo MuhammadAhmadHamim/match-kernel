@@ -56,7 +56,7 @@ This mirrors how real matchmaking handles long queue times — the longer you wa
 | **Backend** | C++17 + cpp-httplib | HTTP server, all endpoints, matchmaking engine |
 | **Frontend** | HTML5, CSS3, Vanilla JS | Live UI, queue visualization, match display |
 | **Build** | g++ MinGW, build.bat | One-command compile and launch |
-| **Data** | In-memory + CSV input | Queue state, match history, bulk player loading |
+| **Data** | In-memory + CSV input | Custom queue state, match history, bulk player loading |
 
 </div>
 
@@ -74,6 +74,7 @@ MatchKernel/
 │   ├── Match.h                ←  Match struct
 │   ├── MatchmakingSystem.h    ←  core matchmaking engine
 │   ├── JsonHelper.h           ←  JSON serialization
+│   ├── queue.h                ← Custom queue implementation
 │   └── Utils.h                ←  string to enum parsers
 │
 ├── frontend/
@@ -275,7 +276,7 @@ Server compiles, starts on `http://localhost:8080`, and the browser opens automa
 
 | Structure | Where It Appears |
 |:---:|:---|
-| **Queue** | Per-rank player queues — core of the matchmaking engine |
+| **Queue** | Per-rank player Custom queues — core of the matchmaking engine |
 | **Vector** | Match history, unmatched player tracking |
 | **Vector of Queues** | Rank-to-queue mapping for O(1) queue access |
 | **Enum** | Rank and subrank type safety across the entire system |

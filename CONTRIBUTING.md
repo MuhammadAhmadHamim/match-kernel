@@ -48,6 +48,7 @@ MatchKernel/
 │   ├── Match.h                ← Match struct
 │   ├── MatchmakingSystem.h    ← core engine, queue management
 │   ├── JsonHelper.h           ← JSON serialization helpers
+│   ├── queue.h                ← Custom queue implementation
 │   └── Utils.h                ← string to enum conversion
 ├── frontend/
 │   ├── index.html             ← page structure and element IDs
